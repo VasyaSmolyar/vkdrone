@@ -1,10 +1,11 @@
-.sheet {
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
+.map-container {
+    width: 100vw;
+    height: 60vh;
+    position: relative;
 }
 
-.map-container {
-    width: 80vw;
-    height: 80vw;
+.place {
+    position: absolute;
+    top: 40vh;
+    left: 45vw;
 }
