@@ -2,10 +2,12 @@
     width: 100vw;
     height: 60vh;
     position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 .place {
     position: absolute;
-    top: 40vh;
-    left: 45vw;
 }

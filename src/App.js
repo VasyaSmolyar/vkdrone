@@ -7,12 +7,25 @@ import '@vkontakte/vkui/dist/vkui.css';
 import Home from './panels/Home';
 import Persik from './panels/Persik';
 import Choiсe from './panels/Choice';
+import Order from './panels/Order';
 
 const App = () => {
 	const [activePanel, setActivePanel] = useState('choice');
 	const [fetchedUser, setUser] = useState(null);
 	const [friend, setFriend] = useState(null);
+	const [recv, setRecv] = useState(null);
+	const [order, setOrder] = useState(null);
 	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
+
+	const createOrder = (user_id, sendGeo, recvGeo, comment) => {
+		bridge.send("VKWebAppCallAPIMethod", {"method": "users.get", "request_id": "7660830", 
+		"params": {"user_ids": user_id, "v":"5.126","fields": "photo_200" , "access_token":
+		"5126aec75126aec75126aec73451524bd9551265126aec70e8b3645ad512894c48650a1"}}).then((data) => {
+			console.log(data);
+			setRecv(data.response[0]);
+			setActivePanel('order')
+		});
+	};
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data }}) => {
@@ -40,7 +53,8 @@ const App = () => {
 	return (
 		<View activePanel={activePanel} popout={popout}>
 			<Home id='home' fetchedUser={fetchedUser} go={go} />
-			<Choiсe id='choice' fetchedUser={friend} />
+			<Choiсe id='choice' fetchedUser={friend} createOrder={createOrder} />
+			<Order id='order' fetchedUser={recv} />
 			<Persik id='persik' go={go} />
 		</View>
 	);
