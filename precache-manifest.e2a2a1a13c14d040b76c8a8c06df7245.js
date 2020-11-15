@@ -1,27 +1,27 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "38ce5c60fc99d1567b89ddc4d815df6d",
+    "revision": "f73fcc50c4aeff1a750b0ac612f51174",
     "url": "/vkdrone/index.html"
   },
   {
-    "revision": "fc32c91d5b01d3ae3446",
+    "revision": "b9823edd042ea707d61b",
     "url": "/vkdrone/static/css/2.8cdfe4cf.chunk.css"
   },
   {
-    "revision": "78b202b221b8c1c99709",
-    "url": "/vkdrone/static/css/main.b7cae34e.chunk.css"
+    "revision": "892a5c5414b0bce5cfff",
+    "url": "/vkdrone/static/css/main.705c489f.chunk.css"
   },
   {
-    "revision": "fc32c91d5b01d3ae3446",
-    "url": "/vkdrone/static/js/2.d39f3b98.chunk.js"
+    "revision": "b9823edd042ea707d61b",
+    "url": "/vkdrone/static/js/2.e7ed9a84.chunk.js"
   },
   {
     "revision": "570d362d673dab785e62d2b8563e1118",
-    "url": "/vkdrone/static/js/2.d39f3b98.chunk.js.LICENSE.txt"
+    "url": "/vkdrone/static/js/2.e7ed9a84.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "78b202b221b8c1c99709",
-    "url": "/vkdrone/static/js/main.14de1a4b.chunk.js"
+    "revision": "892a5c5414b0bce5cfff",
+    "url": "/vkdrone/static/js/main.606c7e09.chunk.js"
   },
   {
     "revision": "09ff20ddbec9aacd1d4b",
