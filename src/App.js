@@ -9,6 +9,8 @@ import Persik from './panels/Persik';
 import Choiсe from './panels/Choice';
 import Order from './panels/Order';
 
+import send from './net';
+
 const App = () => {
 	const [activePanel, setActivePanel] = useState('choice');
 	const [fetchedUser, setUser] = useState(null);
@@ -21,9 +23,23 @@ const App = () => {
 		bridge.send("VKWebAppCallAPIMethod", {"method": "users.get", "request_id": "7660830", 
 		"params": {"user_ids": user_id, "v":"5.126","fields": "photo_200" , "access_token":
 		"5126aec75126aec75126aec73451524bd9551265126aec70e8b3645ad512894c48650a1"}}).then((data) => {
-			console.log(data);
-			setRecv(data.response[0]);
-			setActivePanel('order')
+			const apply = {
+				sendLat: sendGeo.lat, 
+				sendLon: sendGeo.lon,
+				recvLat: recvGeo.lat,
+				recvLon: recvGeo.lon,
+				comment: comment,
+				sender: fetchedUser.id,
+				receiver: user_id
+			};
+			console.log(apply);
+			send('api/order/create', 'POST', apply, (json) => {
+				if(json !== null) {
+					setRecv(data.response[0]);
+					setOrder(json);
+					setActivePanel('order');
+				}
+			});
 		});
 	};
 
@@ -54,7 +70,7 @@ const App = () => {
 		<View activePanel={activePanel} popout={popout}>
 			<Home id='home' fetchedUser={fetchedUser} go={go} />
 			<Choiсe id='choice' fetchedUser={friend} createOrder={createOrder} />
-			<Order id='order' fetchedUser={recv} />
+			<Order id='order' fetchedUser={recv} order={order} />
 			<Persik id='persik' go={go} />
 		</View>
 	);

@@ -9,6 +9,10 @@ import Avatar from '@vkontakte/vkui/dist/components/Avatar/Avatar';
 
 const Order = ({ id, order, fetchedUser }) => {
 
+    let msUTC = Date.parse(order.date_create);
+    msUTC += order.minutes * 60 * 1000;
+    let date = new Date(msUTC);
+
     return (
         <Panel id={id}>
 		    <PanelHeader>Доставка</PanelHeader>
@@ -21,7 +25,8 @@ const Order = ({ id, order, fetchedUser }) => {
                 </Cell>
             </Group>
             <Div>
-                <Header>Доставим в 15:30</Header>
+                <Header>Доставим в {date.getHours()}:{date.getMinutes()}</Header>
+                <Cell>{order.comment}</Cell>
             </Div>
         </Panel>
     );

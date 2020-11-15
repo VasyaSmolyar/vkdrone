@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Panel from '@vkontakte/vkui/dist/components/Panel/Panel';
 import Cell from '@vkontakte/vkui/dist/components/Cell/Cell';
 import Button from '@vkontakte/vkui/dist/components/Button/Button';
@@ -12,14 +12,17 @@ import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
 import bridge from '@vkontakte/vk-bridge';
 import place from './place.png';
 import './Choice.css';
+import send from '../net';
 
 const Choiсe = ({ id, fetchedUser, createOrder }) => {
     const mapContainer = useRef(null);
     const [addr, setAddr] = useState('');
     const [lastStage, setStage] = useState(false);
+    const [tekGeo, setTek] = useState(null);
     const [sendGeo, setSend] = useState(null);
-    const [recvGeo, setRecv] = useState(null);
-    const [comment, setComment] = useState(null);
+    const [comment, setComment] = useState('');
+    const [disabled, setDisabled] = useState(true);
+    const [mapSt, setMap] = useState(null);
 
     mapboxgl.accessToken = 'pk.eyJ1IjoibG9yZGRlc2VjcmF0b3IiLCJhIjoiY2toZ2hraGVrMDd5eDJ0bzFraG9meDY3NyJ9.2yax9LYlpPdMQiRHp-1njg';
 
@@ -30,56 +33,83 @@ const Choiсe = ({ id, fetchedUser, createOrder }) => {
         fetch(url).then((json) => {
             json.json().then((data) => {
                 setAddr(data.features[0].place_name);
+                setTek({
+                    lon: lng,
+                    lat: lat
+                });
             });
         });
-        if(lastStage) {
-            setRecv({
-                lon: lng,
-                lat: lat
-            });
-        } else {
-            setSend({
-                lon: lng,
-                lat: lat
+    }
+
+    const setCoord = useCallback((e) => {
+        const coords = e.lngLat;
+        geocode(coords.lng, coords.lat);
+    });
+
+    const coordWrap = (e) => {
+        setCoord(e);
+    }
+
+    useEffect(() => {
+       // if(!lastStage) {
+            (async () => {
+                let lat = 56.74;
+                let lon = 37.17;
+                try { 
+                    const geo = await bridge.send("VKWebAppGetGeodata");
+                    if(geo.available) {
+                        lat = geo.lat;
+                        lon = geo.long;
+                    }
+                } catch(e) {
+
+                }
+                const map = new mapboxgl.Map({
+                    container: mapContainer.current,
+                    style: 'mapbox://styles/mapbox/streets-v11',
+                    center: [lon, lat],
+                    zoom: 12.5
+                });
+                map.on('mouseup', coordWrap);
+                setMap(map);
+                geocode(lon, lat);
+                return () => map.remove();
+            })();
+       // }
+    }, []);
+
+    const checkBut = (lng, lat) => {
+        if(true) {
+            const apply = {
+                sendLat: tekGeo.lat, 
+                sendLon: tekGeo.lon,
+                recvLat: lat,
+                recvLon: lng,
+            };
+            console.log(apply);
+            send('api/available/check', 'POST', apply, (json) => {
+                console.log(json);
+                if(json.available) {
+                    setDisabled(false);
+                } else {
+                    setDisabled(true);
+                }
             });
         }
     }
 
-    const setCoord = (e) => {
-        const coords = e.lngLat;
-        geocode(coords.lng, coords.lat);
-    }
-
-    useEffect(() => {
-        (async () => {
-            let lat = 56.74;
-            let lon = 37.17;
-            const geo = await bridge.send("VKWebAppGetGeodata");
-            if(geo.available) {
-                lat = geo.lat;
-                lon = geo.long;
-            }
-            const map = new mapboxgl.Map({
-                container: mapContainer.current,
-                style: 'mapbox://styles/mapbox/streets-v11',
-                center: [lon, lat],
-                zoom: 12.5
-            });
-            map.on('mouseup', (e) => {
-                setCoord(e);
-            });
-            geocode(lon, lat);
-            return () => map.remove();
-        })();
-    }, []);
-
-
     const choiceSend = () => {
+        setSend(tekGeo);
         setStage(true);
+        
+        mapSt.on('mouseup', (e) => {
+            const coords = e.lngLat;
+            checkBut(coords.lng, coords.lat);
+        });
     }
 
     const choiceRecv = () => {
-        createOrder(fetchedUser.id, sendGeo, recvGeo, comment);
+        createOrder(fetchedUser.id, sendGeo, tekGeo, comment);
     }
 
     return (
@@ -108,8 +138,8 @@ const Choiсe = ({ id, fetchedUser, createOrder }) => {
                     {lastStage && <Div>
                         <Textarea placeholder="Комментарий" value={comment} onChange={(event) => setComment(event.target.value)} />
                     </Div> }
-                    <Div style={{display: 'flex'}} onClick={lastStage ? choiceRecv : choiceSend}>
-                        <Button size="l" stretched>Продолжить</Button>
+                    <Div style={{display: 'flex'}} onClick={() => {lastStage ? choiceRecv() : choiceSend()}}>
+                        <Button size="l" stretched disabled={disabled && lastStage}>Продолжить</Button>
                     </Div>
                 </Div>
             </Group>
